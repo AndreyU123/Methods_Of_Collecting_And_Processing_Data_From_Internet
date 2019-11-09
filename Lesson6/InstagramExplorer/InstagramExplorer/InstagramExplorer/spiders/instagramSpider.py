@@ -21,6 +21,7 @@ class InstagramSpider(scrapy.Spider):
     base_url='https://www.instagram.com/'
     user_url_posts_suffix='/?__a=1'
     folowings_passed_posts={}
+    exit_for_users={}
 
     def __init__(self, login, pwd, pars_users, posts_count_per_user, *args, **kwargs):
         self.login = login
@@ -30,7 +31,9 @@ class InstagramSpider(scrapy.Spider):
         self.query_hash = 'd04b0a864b4b54837c0d870b0e77e076'
         self.posts_query_hash='2c5d4d8b70cad329c4a6ebe3abb6eedd'
         self.post_query_hash='d5d763b1e2acf209d62d22d184488e57'
-        self.exit_from_app=False
+        for user in pars_users:
+            self.exit_for_users.update({user : False})
+
         super().__init__(*args, *kwargs)
 
     def parse(self, response: HtmlResponse):
@@ -146,8 +149,8 @@ class InstagramSpider(scrapy.Spider):
             if self.folowings_passed_posts[key] < min(self.posts_count_per_user,real_post_count):
                 is_exit = False
                 break
-        if is_exit:  # and not self.exit_from_app: #for many users user we can do update in DB, if it exists
-            #self.exit_from_app=True
+        if is_exit and not self.exit_for_users[user]:
+            self.exit_for_users[user]=True
             item = ItemLoader(InstagramExplorerItem(), response)
             item.add_value('user', user)
             item.add_value('following_users', self.followings[user])
