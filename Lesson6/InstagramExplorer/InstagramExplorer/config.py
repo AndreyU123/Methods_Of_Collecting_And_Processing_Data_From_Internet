@@ -1,0 +1,4 @@
+INSTANT_LOGIN = 'somelogin'
+INSTANT_PASS = 'somepassword'
+INSTANT_PARS_USERS=['resin_wood_stav26']
+INSTANT_POSTS_COUNT_PER_USER=10
